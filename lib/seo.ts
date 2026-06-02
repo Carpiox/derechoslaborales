@@ -1,30 +1,29 @@
 import type { Metadata } from "next";
 
-import { absoluteUrl } from "@/lib/hreflang";
+import { generateHreflang, SITE_URL, absoluteUrl } from "@/lib/hreflang";
 import type { ArticleFrontmatter } from "@/lib/mdx";
 
-type SeoInput = {
-  frontmatter: ArticleFrontmatter;
-  hreflangs?: Record<string, string>;
-};
-
-export function generateSeoMetadata({ frontmatter, hreflangs = {} }: SeoInput): Metadata {
-  const url = absoluteUrl(`/${frontmatter.pais}/${frontmatter.slug}`);
+export async function generateArticleMetadata(frontmatter: ArticleFrontmatter): Promise<Metadata> {
+  const canonicalUrl = `${SITE_URL}/${frontmatter.pais}/${frontmatter.slug}`;
+  const languages = await generateHreflang(frontmatter.pais, frontmatter.slug);
+  const title = `${frontmatter.title} | DerechosLaborales`;
 
   return {
-    title: frontmatter.title,
+    title: {
+      absolute: title
+    },
     description: frontmatter.description,
     keywords: frontmatter.palabrasClave,
     authors: [{ name: frontmatter.autor }],
     alternates: {
-      canonical: url,
-      languages: hreflangs
+      canonical: canonicalUrl,
+      languages
     },
     openGraph: {
-      title: frontmatter.title,
+      title,
       description: frontmatter.description,
       type: "article",
-      url,
+      url: canonicalUrl,
       publishedTime: frontmatter.fechaPublicacion,
       modifiedTime: frontmatter.fechaActualizacion,
       authors: [frontmatter.autor],
@@ -32,7 +31,7 @@ export function generateSeoMetadata({ frontmatter, hreflangs = {} }: SeoInput): 
     },
     twitter: {
       card: "summary_large_image",
-      title: frontmatter.title,
+      title,
       description: frontmatter.description
     }
   };

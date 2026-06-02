@@ -5,9 +5,8 @@ import type { ComponentPropsWithoutRef } from "react";
 
 import ArticleLayout from "@/components/ArticleLayout";
 import FAQSection from "@/components/FAQSection";
-import { getAllArticles, getArticleBySlug, getArticlesBySlug, slugify } from "@/lib/mdx";
-import { generateHreflangAlternates } from "@/lib/hreflang";
-import { generateSeoMetadata } from "@/lib/seo";
+import { getAllArticles, getArticleBySlug, slugify } from "@/lib/mdx";
+import { generateArticleMetadata } from "@/lib/seo";
 
 type ArticlePageProps = {
   params: {
@@ -34,15 +33,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     return {};
   }
 
-  const variants = await getArticlesBySlug(article.frontmatter.slug);
-  const hreflangs = generateHreflangAlternates(
-    variants.map((variant) => ({
-      pais: variant.frontmatter.pais,
-      slug: variant.frontmatter.slug
-    }))
-  );
-
-  return generateSeoMetadata({ frontmatter: article.frontmatter, hreflangs });
+  return generateArticleMetadata(article.frontmatter);
 }
 
 const mdxComponents = {

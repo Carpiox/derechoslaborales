@@ -1,4 +1,8 @@
-import type { Pais } from "@/lib/mdx";
+import "server-only";
+
+import { getAllArticles, isPais, type Pais } from "@/lib/mdx";
+
+export const SITE_URL = "https://derechoslaborales.com";
 
 export const COUNTRY_LOCALES: Record<Pais, string> = {
   espana: "es-ES",
@@ -8,30 +12,25 @@ export const COUNTRY_LOCALES: Record<Pais, string> = {
   general: "es"
 };
 
-export type HreflangTarget = {
-  pais: Pais;
-  slug: string;
-};
-
 export function getBaseUrl(): string {
-  return (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.derechoslaborales.com").replace(/\/$/, "");
+  return (process.env.NEXT_PUBLIC_SITE_URL ?? SITE_URL).replace(/\/$/, "");
 }
 
 export function absoluteUrl(pathname: string): string {
   return `${getBaseUrl()}${pathname.startsWith("/") ? pathname : `/${pathname}`}`;
 }
 
-export function generateHreflangAlternates(targets: HreflangTarget[]): Record<string, string> {
-  const languages = targets.reduce<Record<string, string>>((accumulator, target) => {
-    accumulator[COUNTRY_LOCALES[target.pais]] = absoluteUrl(`/${target.pais}/${target.slug}`);
-    return accumulator;
-  }, {});
-
-  const defaultTarget = targets.find((target) => target.pais === "general") ?? targets[0];
-
-  if (defaultTarget) {
-    languages["x-default"] = absoluteUrl(`/${defaultTarget.pais}/${defaultTarget.slug}`);
+export async function generateHreflang(pais: string, tema: string): Promise<Record<string, string>> {
+  if (!isPais(pais)) {
+    return {};
   }
 
-  return languages;
+  const articles = await getAllArticles();
+
+  return articles
+    .filter((article) => article.frontmatter.slug === tema)
+    .reduce<Record<string, string>>((languages, article) => {
+      languages[COUNTRY_LOCALES[article.frontmatter.pais]] = `/${article.frontmatter.pais}/${article.frontmatter.slug}`;
+      return languages;
+    }, {});
 }

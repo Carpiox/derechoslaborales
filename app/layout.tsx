@@ -2,20 +2,29 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import CountrySelector from "@/components/CountrySelector";
-import { getBaseUrl } from "@/lib/hreflang";
 
 import "./globals.css";
 
+const siteDescription = "Guías claras y actualizadas sobre derechos laborales por país.";
+
 export const metadata: Metadata = {
-  metadataBase: new URL(getBaseUrl()),
+  metadataBase: new URL("https://derechoslaborales.com"),
   title: {
-    default: "Derechos Laborales",
-    template: "%s | Derechos Laborales"
+    default: "DerechosLaborales.com",
+    template: "%s | DerechosLaborales.com"
   },
-  description: "Guías claras y actualizadas sobre derechos laborales por país.",
-  applicationName: "Derechos Laborales",
+  description: siteDescription,
+  applicationName: "DerechosLaborales.com",
   alternates: {
     canonical: "/"
+  },
+  openGraph: {
+    title: "DerechosLaborales.com",
+    description: siteDescription,
+    url: "https://derechoslaborales.com",
+    siteName: "DerechosLaborales.com",
+    locale: "es_ES",
+    type: "website"
   }
 };
 
